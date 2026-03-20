@@ -1,0 +1,66 @@
+name: HeroDevs EOL Scan
+description: Scans your project for end-of-life dependencies using HeroDevs EOL Scanner
+author: HeroDevs
+
+inputs:
+  auth-token:
+    description: HeroDevs authentication token
+    required: true
+  output-path:
+    description: Filename for the report
+    required: false
+    default: herodevs.report.json
+  method:
+    description: Execution method - 'docker' or 'client'
+    required: false
+    default: docker
+
+outputs:
+  report-path:
+    description: Path to the generated EOL report
+    value: ${{ steps.set-output-docker.outputs.report-path || steps.set-output-client.outputs.report-path }}
+
+runs:
+  using: composite
+  steps:
+
+    # ── Docker method ──────────────────────────────────────────
+    - name: Build EOL Scanner image
+      if: inputs.method == 'docker'
+      shell: bash
+      run: docker build -t eol-scan-action ${{ github.action_path }}
+
+    - name: Run EOL Scan (docker)
+      if: inputs.method == 'docker'
+      shell: bash
+      run: |
+        docker run --rm \
+          -e HD_CI_CREDENTIAL="${{ inputs.auth-token }}" \
+          -e HOME=/tmp \
+          -v "${{ github.workspace }}:/github/workspace" \
+          -w /github/workspace \
+          eol-scan-action "${{ inputs.output-path }}"
+
+    - name: Set output (docker)
+      id: set-output-docker
+      if: inputs.method == 'docker'
+      shell: bash
+      run: echo "report-path=${{ github.workspace }}/${{ inputs.output-path }}" >> $GITHUB_OUTPUT
+
+    # ── Client method ──────────────────────────────────────────
+    - name: Setup Node
+      if: inputs.method == 'client'
+      uses: actions/setup-node@v6
+      with:
+        node-version: '24'
+
+    - name: Run EOL Scan (client)
+      if: inputs.method == 'client'
+      shell: bash
+      env:
+        HD_CI_CREDENTIAL: ${{ inputs.auth-token }}
+        NODE_NO_WARNINGS: 1
+      run: |
+        npm install -g @herodevs/cli rxjs
+        hd scan eol -s --output ${{ github.workspace }}/${{ inputs.output-path }}
+        echo "report-path=${{ github.workspace }}/${{ inputs.output-path }}" >> $GITHUB_OUTPUT
