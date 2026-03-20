@@ -1,6 +1,6 @@
 # HeroDevs EOL Scan Action
 
-A GitHub Action that scans your project for end-of-life (EOL) dependencies using the [HeroDevs EOL Scanner](https://www.herodevs.com/).
+A GitHub Action that scans your project for end-of-life (EOL) dependencies using the [HeroDevs EOL Data Set](https://www.herodevs.com/eol-dataset).
 
 ## Prerequisites
 
