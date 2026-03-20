@@ -10,9 +10,10 @@ A GitHub Action that scans your project for end-of-life (EOL) dependencies using
 
 Store your HeroDevs token as a repository or organization secret:
 
-1. Go to **Settings → Secrets and variables → Actions → Secrets**
-2. Click **New repository secret**
-3. Name it `HD_CI_CREDENTIAL` and paste your token as the value
+1. Generate a client CLI token (see [EOL DS docs](https://docs.herodevs.com/eol-ds/getting-started#hd-auth-provision-ci-token))
+2. Go to **Settings → Secrets and variables → Actions → Secrets**
+3. Click **New repository secret**
+4. Name it `HD_CI_CREDENTIAL` and paste your token as the value
 
 ## Usage
 
